@@ -40,6 +40,6 @@ public class Propertyentity {
     @ManyToOne
     private Host host;
 
-    @OneToMany(mappedBy = "propertyentity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy ="propertyentity", cascade = CascadeType.ALL)
     private List<PropertyImage> images = new ArrayList<>();
 }

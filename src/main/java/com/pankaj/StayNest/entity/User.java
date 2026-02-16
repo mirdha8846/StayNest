@@ -1,6 +1,7 @@
 package com.pankaj.StayNest.entity;
 
 
+import com.pankaj.StayNest.entity.type.Authprovidertype;
 import com.pankaj.StayNest.entity.type.RoleType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,9 @@ public class User implements UserDetails {
     private String username;
 
     private String password;
+    private  String providerId;
+    @Enumerated(EnumType.STRING)
+    private Authprovidertype providertype;
 
     private LocalDate createdAt;
     private LocalDate updatedAt;

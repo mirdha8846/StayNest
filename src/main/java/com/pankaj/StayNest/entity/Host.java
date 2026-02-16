@@ -21,7 +21,8 @@ public class Host {
     private String username;
     @Column(nullable = false)
     private Long payoutAccountNumber;
-
+    @Column(unique = true)
+    private String email;
     @JoinColumn(unique = true)
     @OneToOne
     @MapsId

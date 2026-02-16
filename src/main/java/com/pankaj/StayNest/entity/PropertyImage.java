@@ -18,5 +18,5 @@ public class PropertyImage {
     //property_id (FK)
     @ManyToOne
     @JoinColumn(name = "property_id")
-    private Propertyentity property;
+    private Propertyentity propertyentity;
 }
