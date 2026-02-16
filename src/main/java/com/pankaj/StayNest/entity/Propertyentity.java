@@ -1,13 +1,12 @@
 package com.pankaj.StayNest.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -33,5 +32,14 @@ public class Propertyentity {
     private LocalDate createdAt;
     private LocalDate updatedAt;
 
+    @OneToMany(mappedBy = "propertyentity", cascade = CascadeType.ALL)
+    private List<Booking> bookings = new ArrayList<>();
+
 //    host_id (FK → User)
+    @JoinColumn(name="host_id")
+    @ManyToOne
+    private Host host;
+
+    @OneToMany(mappedBy = "propertyentity", cascade = CascadeType.ALL)
+    private List<PropertyImage> images = new ArrayList<>();
 }

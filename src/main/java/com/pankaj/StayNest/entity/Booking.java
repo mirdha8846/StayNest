@@ -25,15 +25,21 @@ private Long id;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private  double totalPrice;
+    private LocalDate createdAt;
 
 //    status (PENDING / CONFIRMED / CANCELLED)
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     Set<StatusType> staus=new HashSet<>();
-//
+
 //    guest_id (FK → User)
-//
+    @JoinColumn(name = "guest_id")
+    @ManyToOne
+    private Guest guest;
+
 //    property_id (FK → Property)
-//
-    private LocalDate createdAt;
+    @JoinColumn(name = "property_id")
+    @ManyToOne
+    private Propertyentity propertyentity;
+
 }

@@ -18,24 +18,28 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Payment {
-//    id
+
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 private Long id;
 
-//            amount
+//  amount
     private double amount;
 
-//
-//    paymentStatus (SUCCESS / FAILED / REFUNDED)
-        @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
+
+// paymentStatus (SUCCESS / FAILED / REFUNDED)
+@ElementCollection(fetch = FetchType.EAGER)
+@Enumerated(EnumType.STRING)
 Set<PaymentStatusType> role=new HashSet<>();
-//
+
+
 //    paymentMethod
-//
+
 //            transactionId
     private Long transactionId;
 //
 //    booking_id (FK)
+    @JoinColumn(name = "booking_id",unique = true)
+    @OneToOne
+    private Booking booking;
 }
