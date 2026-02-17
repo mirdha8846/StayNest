@@ -15,12 +15,17 @@ import com.pankaj.StayNest.repository.HostRepository;
 import com.pankaj.StayNest.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -43,10 +48,14 @@ public class AuthService {
       String accessToken= authUtil.genrateAccesstoken(user);
       return new LoginResponseDto(accessToken,user.getId());
   }
+
+
     public SignUpResponseDto signup(SignUpReqestDto signUpReqestDto){
         User user= signUpInternal(signUpReqestDto,authprovidertype.EMAIL,null);
         return modelMapper.map(user,SignUpResponseDto.class);
     }
+
+
     @Transactional
     public User signUpInternal(SignUpReqestDto dto, Authprovidertype type, String providerId) {
 
@@ -90,4 +99,34 @@ public class AuthService {
         return user;
     }
 
+
+    public ResponseEntity<LoginResponseDto> oauthlogin(OAuth2User oAuth2User,String registrationId){
+        Authprovidertype providerType = authUtil.getAuthProviderTypeById(registrationId);
+        String providerId = authUtil.getProvidedIdByOAuth2User(oAuth2User, registrationId);
+
+        User user = userRepository.findByProviderIdAndProviderType(providerId, providerType).orElse(null);
+        String email = oAuth2User.getAttribute("email");
+        String name = oAuth2User.getAttribute("name");
+
+        User emailUser = userRepository.findByUsernam(email).orElse(null);
+
+        if(user == null && emailUser == null) {
+            // signup flow:
+            String username = authUtil.determineUsernameFromOAuth2User(oAuth2User, registrationId, providerId);
+            user =signUpInternal(new SignUpReqestDto(username, null, name, email,null,Set.of(RoleType.GUEST)),
+                    authprovidertype, providerId);
+        } else if(user != null) {
+            if(email != null && !email.isBlank() && !email.equals(user.getUsername())) {
+                user.setUsername(email);
+                userRepository.save(user);
+            }
+        } else {
+            throw new BadCredentialsException("This email is already registered with provider "+emailUser.getProvidertype());
+        }
+
+        LoginResponseDto loginResponseDto = new LoginResponseDto(authUtil.genrateAccesstoken(user), user.getId());
+        return ResponseEntity.ok(loginResponseDto);
+    }
+
+    }
 }
